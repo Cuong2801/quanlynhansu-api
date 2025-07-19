@@ -1,39 +1,96 @@
 const express = require("express");
 const router = express.Router();
-const db = require("../config/db.config");
+const controller = require("../controllers/congviecdukien.controller");
 
-// Lấy tất cả công việc dự kiến
-router.get("/", async (req, res) => {
-  const [rows] = await db.query("SELECT * FROM CongViecDuKien");
-  res.json(rows);
-});
+/**
+ * @swagger
+ * tags:
+ *   name: CongViecDuKien
+ *   description: API công việc dự kiến
+ */
 
-// Thêm công việc dự kiến
-router.post("/", async (req, res) => {
-  const data = req.body;
-  await db.query(
-    "INSERT INTO CongViecDuKien (user_id, thangNam, congViecDuKien) VALUES (?, ?, ?)",
-    [data.user_id, data.thangNam, data.congViecDuKien]
-  );
-  res.json({ message: "Thêm công việc dự kiến thành công" });
-});
+/**
+ * @swagger
+ * /api/congviecdukien:
+ *   get:
+ *     summary: Lấy danh sách công việc dự kiến
+ *     tags: [CongViecDuKien]
+ *     responses:
+ *       200:
+ *         description: Thành công
+ */
+router.get("/", controller.getAll);
 
-// Cập nhật công việc dự kiến
-router.put("/:id", async (req, res) => {
-  const id = req.params.id;
-  const data = req.body;
-  await db.query(
-    "UPDATE CongViecDuKien SET user_id=?, thangNam=?, congViecDuKien=? WHERE id=?",
-    [data.user_id, data.thangNam, data.congViecDuKien, id]
-  );
-  res.json({ message: "Cập nhật công việc dự kiến thành công" });
-});
+/**
+ * @swagger
+ * /api/congviecdukien/{id}:
+ *   get:
+ *     summary: Lấy công việc dự kiến theo ID
+ *     tags: [CongViecDuKien]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Thành công
+ */
+router.get("/:id", controller.getById);
 
-// Xóa công việc dự kiến
-router.delete("/:id", async (req, res) => {
-  const id = req.params.id;
-  await db.query("DELETE FROM CongViecDuKien WHERE id = ?", [id]);
-  res.json({ message: "Xóa công việc dự kiến thành công" });
-});
+/**
+ * @swagger
+ * /api/congviecdukien:
+ *   post:
+ *     summary: Tạo công việc dự kiến
+ *     tags: [CongViecDuKien]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       201:
+ *         description: Tạo thành công
+ */
+router.post("/", controller.create);
+
+/**
+ * @swagger
+ * /api/congviecdukien/{id}:
+ *   put:
+ *     summary: Cập nhật công việc dự kiến
+ *     tags: [CongViecDuKien]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Cập nhật thành công
+ */
+router.put("/:id", controller.update);
+
+/**
+ * @swagger
+ * /api/congviecdukien/{id}:
+ *   delete:
+ *     summary: Xoá công việc dự kiến
+ *     tags: [CongViecDuKien]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Xoá thành công
+ */
+router.delete("/:id", controller.delete);
 
 module.exports = router;

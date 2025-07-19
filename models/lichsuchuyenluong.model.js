@@ -1,40 +1,71 @@
 const db = require("../config/db.config");
 
-const LichSuChuyenLuongModel = {
+const LichSuChuyenLuong = {
+  // Lấy tất cả lịch sử chuyển lương
   getAll: async () => {
-    const [rows] = await db.query("SELECT * FROM LichSuChuyenluong");
-    return rows;
+    try {
+      const [results] = await db.query("SELECT * FROM LichSuChuyenLuong");
+      return results;
+    } catch (err) {
+      throw err;
+    }
   },
+
+  // Tạo mới một bản ghi lịch sử chuyển lương
   create: async (data) => {
-    await db.query(
-      "INSERT INTO LichSuChuyenluong (user_id, ngayChuyenTien, soTien, thongTinNhanLuong, noiDung, trangThai) VALUES (?, ?, ?, ?, ?, ?)",
-      [
-        data.user_id,
-        data.ngayChuyenTien,
-        data.soTien,
-        data.thongTinNhanLuong,
-        data.noiDung,
-        data.trangThai,
-      ]
-    );
+    try {
+      const {
+        user_id,
+        ngayChuyenTien,
+        soTien,
+        thongTinNhanLuong,
+        noiDung,
+        trangThai,
+      } = data;
+
+      const [result] = await db.query(
+        `INSERT INTO LichSuChuyenLuong (user_id, ngayChuyenTien, soTien, thongTinNhanLuong, noiDung, trangThai) 
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [user_id, ngayChuyenTien, soTien, thongTinNhanLuong, noiDung, trangThai]
+      );
+
+      return result.insertId;
+    } catch (err) {
+      throw err;
+    }
   },
+
+  // Cập nhật lịch sử chuyển lương theo ID
   update: async (id, data) => {
-    await db.query(
-      "UPDATE LichSuChuyenluong SET user_id = ?, ngayChuyenTien = ?, soTien = ?, thongTinNhanLuong = ?, noiDung = ?, trangThai = ? WHERE id = ?",
-      [
-        data.user_id,
-        data.ngayChuyenTien,
-        data.soTien,
-        data.thongTinNhanLuong,
-        data.noiDung,
-        data.trangThai,
-        id,
-      ]
-    );
+    try {
+      const {
+        user_id,
+        ngayChuyenTien,
+        soTien,
+        thongTinNhanLuong,
+        noiDung,
+        trangThai,
+      } = data;
+
+      await db.query(
+        `UPDATE LichSuChuyenLuong 
+         SET user_id = ?, ngayChuyenTien = ?, soTien = ?, thongTinNhanLuong = ?, noiDung = ?, trangThai = ? 
+         WHERE id = ?`,
+        [user_id, ngayChuyenTien, soTien, thongTinNhanLuong, noiDung, trangThai, id]
+      );
+    } catch (err) {
+      throw err;
+    }
   },
+
+  // Xóa lịch sử chuyển lương theo ID
   delete: async (id) => {
-    await db.query("DELETE FROM LichSuChuyenluong WHERE id = ?", [id]);
+    try {
+      await db.query("DELETE FROM LichSuChuyenLuong WHERE id = ?", [id]);
+    } catch (err) {
+      throw err;
+    }
   },
 };
 
-module.exports = LichSuChuyenLuongModel;
+module.exports = LichSuChuyenLuong;

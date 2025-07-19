@@ -2,21 +2,44 @@ const db = require("../config/db.config");
 
 const ChiTietUsersModel = {
   getAll: async () => {
-    const [rows] = await db.query("SELECT * FROM ChiTietUsers");
+    const [rows] = await db.query(`
+      SELECT ct.*, tk.email
+      FROM ChiTietUsers ct
+      JOIN TaiKhoan tk ON ct.user_id = tk.id
+    `);
     return rows;
   },
-  create: async (data) => {
-    await db.query(
-      "INSERT INTO ChiTietUsers (hoTen, email, user_id, gioiTinh, ngaySinh, phone, CCCD, diaChi) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-      [data.hoTen, data.email, data.user_id, data.gioiTinh, data.ngaySinh, data.phone, data.CCCD, data.diaChi]
-    );
+
+  getById: async (id) => {
+    const [rows] = await db.query(`
+      SELECT ct.*, tk.email
+      FROM ChiTietUsers ct
+      JOIN TaiKhoan tk ON ct.user_id = tk.id
+      WHERE ct.id = ?
+    `, [id]);
+    return rows[0];
   },
+
+  create: async ({ user_id, hoTen, gioiTinh, ngaySinh, phone, CCCD, diaChi, phongBan, hinhThuc }) => {
+    const [result] = await db.query(`
+      INSERT INTO ChiTietUsers 
+        (user_id, hoTen, gioiTinh, ngaySinh, phone, CCCD, diaChi, phongBan, hinhThuc) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [user_id, hoTen, gioiTinh, ngaySinh, phone, CCCD, diaChi, phongBan, hinhThuc]
+    );
+    return result.insertId;
+  },
+
   update: async (id, data) => {
-    await db.query(
-      "UPDATE ChiTietUsers SET hoTen = ?, email = ?, user_id = ?, gioiTinh = ?, ngaySinh = ?, phone = ?, CCCD = ?, diaChi = ? WHERE id = ?",
-      [data.hoTen, data.email, data.user_id, data.gioiTinh, data.ngaySinh, data.phone, data.CCCD, data.diaChi, id]
+    const { hoTen, user_id, gioiTinh, ngaySinh, phone, CCCD, diaChi, phongBan, hinhThuc } = data;
+    await db.query(`
+      UPDATE ChiTietUsers 
+      SET hoTen=?, user_id=?, gioiTinh=?, ngaySinh=?, phone=?, CCCD=?, diaChi=?, phongBan=?, hinhThuc=? 
+      WHERE id=?`,
+      [hoTen, user_id, gioiTinh, ngaySinh, phone, CCCD, diaChi, phongBan, hinhThuc, id]
     );
   },
+
   delete: async (id) => {
     await db.query("DELETE FROM ChiTietUsers WHERE id = ?", [id]);
   },

@@ -1,13 +1,18 @@
 const express = require("express");
-const bodyParser = require("body-parser");
 const cors = require("cors");
 const dotenv = require("dotenv");
 dotenv.config();
 
 const app = express();
 
+// Middleware
 app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Swagger UI
+const { swaggerUi, specs } = require("./swagger");
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
 // Import Routes
 const taiKhoanRoutes = require("./routes/taikhoan.routes");
@@ -20,11 +25,13 @@ const luongUserRoutes = require("./routes/luonguser.routes");
 const congViecDuKienRoutes = require("./routes/congviecdukien.routes");
 const luongThucTeRoutes = require("./routes/luongthucte.routes");
 const lichSuChuyenLuongRoutes = require("./routes/lichsuchuyenluong.routes");
-const authRoutes = require("./routes/auth.routes");  // Đăng nhập
+const lichSuThayDoiRoutes = require("./routes/lichsuthaydoi.routes");
+const authRoutes = require("./routes/auth.routes");
+const hopDongRoutes = require("./routes/hopdong.routes"); // ✅ THÊM Ở ĐÂY
 
-// Dùng Routes
+// Sử dụng Routes
 app.use("/api/taikhoan", taiKhoanRoutes);
-app.use("/api/chitietusers", chiTietUsersRoutes);
+app.use("/api/chitietuser", chiTietUsersRoutes);
 app.use("/api/donphep", donPhepRoutes);
 app.use("/api/pheduyetdon", pheDuyetDonRoutes);
 app.use("/api/luongnhansu", luongNhanSuRoutes);
@@ -33,14 +40,23 @@ app.use("/api/luonguser", luongUserRoutes);
 app.use("/api/congviecdukien", congViecDuKienRoutes);
 app.use("/api/luongthucte", luongThucTeRoutes);
 app.use("/api/lichsuchuyenluong", lichSuChuyenLuongRoutes);
-app.use("/api/auth", authRoutes);  // Đăng nhập
+app.use("/api/lichsuthaydoi", lichSuThayDoiRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/hopdong", hopDongRoutes); // ✅ THÊM Ở ĐÂY
 
-// Test API
+// Swagger test
+app.get("/ping", (req, res) => {
+  res.send("Swagger OK");
+});
+
+// Root API
 app.get("/", (req, res) => {
   res.send("✅ API Nhân Sự đang chạy!");
 });
 
+// Listen
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
+  console.log(`📚 Swagger UI: http://localhost:${PORT}/api-docs`);
 });

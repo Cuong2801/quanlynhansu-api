@@ -1,14 +1,59 @@
+// routes/auth.routes.js
 const express = require("express");
-const router = express.Router();
+const routerAuth = express.Router();
+const authController = require("../controllers/auth.controller");
 
-router.post("/login", (req, res) => {
-  const { email, password } = req.body;
-  // Đây là ví dụ đơn giản, sau này anh cần kiểm tra DB thật
-  if (email === "admin@example.com" && password === "123456") {
-    res.json({ message: "Đăng nhập thành công", token: "fake-jwt-token" });
-  } else {
-    res.status(401).json({ message: "Sai email hoặc mật khẩu" });
-  }
-});
+/**
+ * @swagger
+ * tags:
+ *   name: Auth
+ *   description: API xác thực người dùng
+ */
 
-module.exports = router;
+/**
+ * @swagger
+ * /api/auth/register:
+ *   post:
+ *     summary: Đăng ký tài khoản
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Tạo tài khoản thành công
+ */
+routerAuth.post("/register", authController.register);
+
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: Đăng nhập tài khoản
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Đăng nhập thành công
+ */
+routerAuth.post("/login", authController.login);
+
+module.exports = routerAuth;
